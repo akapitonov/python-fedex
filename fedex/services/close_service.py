@@ -4,7 +4,6 @@ Close Service Module
 This package contains classes to close shipment with documents
 """
 
-import datetime
 from ..base_service import FedexBaseService
 
 
@@ -27,14 +26,13 @@ class FedexCloseServiceRequest(FedexBaseService):
         self._config_obj = config_obj
 
         # Holds version info for the VersionId SOAP object.
-        self._version_info = {'service_id': 'clos', 'major': '5',
-                              'intermediate': '0', 'minor': '0'}
+        self._version_info = {"service_id": "clos", "major": "5",
+                              "intermediate": "0", "minor": "0"}
 
         self.RequestedShipment = None
-        """@ivar: Holds the RequestedShipment WSDL object including the shipper, recipient and shipt time."""
         # Call the parent FedexBaseService class for basic setup work.
         super(FedexCloseServiceRequest, self).__init__(
-            self._config_obj, 'CloseService_v5.wsdl', *args, **kwargs)
+            self._config_obj, "CloseService_v5.wsdl", *args, **kwargs)
 
     def _prepare_wsdl_objects(self):
         """
@@ -46,7 +44,7 @@ class FedexCloseServiceRequest(FedexBaseService):
 
         self.ActionType = "CLOSE"
 
-        close_document_specification = self.client.factory.create('CloseDocumentSpecification')
+        close_document_specification = self.client.factory.create("CloseDocumentSpecification")
         close_document_specification.CloseDocumentTypes = "MANIFEST"
         self.CloseDocumentSpecification = close_document_specification
 
@@ -55,9 +53,9 @@ class FedexCloseServiceRequest(FedexBaseService):
         manifest_reference_detail.Value = "string"
         self.CloseManifestReferenceDetail = manifest_reference_detail
 
-        # This is good to review if you'd like to see what the data structure
+        # This is good to review if you"d like to see what the data structure
         # looks like.
-        self.logger.debug(self.RequestedShipment)
+        self.logger.debug(self)
 
     def _assemble_and_send_request(self):
         """
@@ -73,4 +71,27 @@ class FedexCloseServiceRequest(FedexBaseService):
             ClientDetail=self.ClientDetail,
             TransactionDetail=self.TransactionDetail,
             Version=self.VersionId,
-            CloseDocumentSpecification=self.CloseDocumentSpecification,)
+            CloseDocumentSpecification=self.CloseDocumentSpecification, )
+
+
+class FedexReprintCloseDocumentsServiceRequest(FedexCloseServiceRequest):
+    def _prepare_wsdl_objects(self):
+        close_document_specification = self.client.factory.create("CloseDocumentSpecification")
+        close_document_specification.CloseDocumentTypes = "MANIFEST"
+        self.CloseDocumentSpecification = close_document_specification
+
+    def _assemble_and_send_request(self):
+        """
+        Fires off the Fedex request.
+
+        @warning: NEVER CALL THIS METHOD DIRECTLY. CALL send_request(),
+            WHICH RESIDES ON FedexBaseService AND IS INHERITED.
+        """
+
+        # Fire off the query.
+        return self.client.service.reprintGroundCloseDocuments(
+            WebAuthenticationDetail=self.WebAuthenticationDetail,
+            ClientDetail=self.ClientDetail,
+            TransactionDetail=self.TransactionDetail,
+            Version=self.VersionId,
+            CloseDocumentSpecification=self.CloseDocumentSpecification, )
