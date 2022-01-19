@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from distutils.core import setup
+
 import fedex
 
 LONG_DESCRIPTION = open('README.rst').read()
@@ -34,5 +35,5 @@ setup(name='fedex',
       classifiers=CLASSIFIERS,
       keywords=KEYWORDS,
       requires=['suds'],
-      install_requires=['suds-jurko'],
+      install_requires=['suds-community'],
       )
