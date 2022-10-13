@@ -4,6 +4,7 @@ Close Service Module
 This package contains classes to close shipment with documents
 """
 
+from datetime import datetime
 from ..base_service import FedexBaseService
 
 
@@ -44,6 +45,8 @@ class FedexCloseServiceRequest(FedexBaseService):
 
         self.ActionType = "CLOSE"
 
+        self.ReprintCloseDate = datetime.now()
+
         close_document_specification = self.client.factory.create("CloseDocumentSpecification")
         close_document_specification.CloseDocumentTypes = "MANIFEST"
         self.CloseDocumentSpecification = close_document_specification
@@ -71,6 +74,7 @@ class FedexCloseServiceRequest(FedexBaseService):
             ClientDetail=self.ClientDetail,
             TransactionDetail=self.TransactionDetail,
             Version=self.VersionId,
+            ReprintCloseDate=self.ReprintCloseDate,
             CloseDocumentSpecification=self.CloseDocumentSpecification, )
 
 
@@ -79,6 +83,7 @@ class FedexReprintCloseDocumentsServiceRequest(FedexCloseServiceRequest):
         close_document_specification = self.client.factory.create("CloseDocumentSpecification")
         close_document_specification.CloseDocumentTypes = "MANIFEST"
         self.CloseDocumentSpecification = close_document_specification
+        self.TrackingNumber = ""
 
     def _assemble_and_send_request(self):
         """
@@ -94,4 +99,5 @@ class FedexReprintCloseDocumentsServiceRequest(FedexCloseServiceRequest):
             ClientDetail=self.ClientDetail,
             TransactionDetail=self.TransactionDetail,
             Version=self.VersionId,
+            TrackingNumber=self.TrackingNumber,
             CloseDocumentSpecification=self.CloseDocumentSpecification, )
